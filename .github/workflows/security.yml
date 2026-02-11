@@ -35,8 +35,4 @@ jobs:
     - name: Run Semgrep
       run: semgrep --config=auto src/ --json > semgrep-report.json
 
-      import os
-
-@app.route("/cmd")
-def cmd():
-    return os.system(request.args.get("command"))
+    
