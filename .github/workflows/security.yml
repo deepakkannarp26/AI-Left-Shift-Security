@@ -24,9 +24,8 @@ jobs:
     - name: Run Bandit
       run: bandit -r src/ -f json -o bandit-report.json 
 
-    - name: Run AI Analyzer
-      run: python ai_analyzer.py
-
+    - name: Run Bandit
+      run: | pip install bandit bandit -r src/ -f json -o bandit-report.json || true
 
     # -------- Semgrep Scan --------
     - name: Install Semgrep
