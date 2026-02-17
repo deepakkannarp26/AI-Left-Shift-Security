@@ -1,27 +1,51 @@
+import os
 import json
+from openai import OpenAI
 
-def analyze_bandit_report():
+client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+
+def analyze_bandit_with_ai():
+
     try:
         with open("bandit-report.json", "r") as f:
-            data = json.load(f)
+            bandit_data = json.load(f)
 
-        issues = data.get("results", [])
+        issues = bandit_data.get("results", [])
 
         if not issues:
-            print("No vulnerabilities found.")
+            print("## ✅ AI Security Review\nNo vulnerabilities found.")
             return
 
-        for issue in issues:
-            print("\n--- Vulnerability Detected ---")
-            print("File:", issue.get("filename"))
-            print("Issue:", issue.get("issue_text"))
-            print("Severity:", issue.get("issue_severity"))
-            print("Confidence:", issue.get("issue_confidence"))
-            print("AI Analysis: This may allow attackers to exploit the system.")
-            print("Suggested Fix: Review this code and apply secure coding practices.")
+        prompt = f"""
+You are a Senior Application Security Engineer.
+
+Analyze the following Bandit SAST findings.
+Identify:
+- Real vulnerability?
+- False positive?
+- CWE reference
+- Severity
+- Secure fix
+
+Return JSON only.
+
+Bandit Findings:
+{json.dumps(issues, indent=2)}
+"""
+
+        response = client.chat.completions.create(
+            model="gpt-4o-mini",
+            temperature=0.2,
+            messages=[
+                {"role": "system", "content": "You are an expert security engineer."},
+                {"role": "user", "content": prompt}
+            ]
+        )
+
+        print(response.choices[0].message.content)
 
     except FileNotFoundError:
         print("Bandit report not found.")
 
 if __name__ == "__main__":
-    analyze_bandit_report()
+    analyze_bandit_with_ai()
