@@ -1,4 +1,4 @@
-name: Left Shift Security Scan
+name: Left Shift Security Scan 
 
 on:
   push:
