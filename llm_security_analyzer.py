@@ -128,3 +128,5 @@ try:
 
 except Exception as e:
     print("Error while enforcing severity policy:", str(e))
+
+password = "admin"
