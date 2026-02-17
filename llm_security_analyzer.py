@@ -122,7 +122,7 @@ try:
     for v in vulnerabilities:
         severity = v.get("severity", "").lower()
 
-        if severity in ["critical", "high"]:
+        if severity in ["critical", "high","medium", "low"]:
             print("\n🚨 Blocking pipeline due to High/Critical vulnerability.")
             exit(1)
 
