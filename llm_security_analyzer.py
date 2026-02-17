@@ -23,26 +23,26 @@ def mock_ai_analysis(diff, bandit_data, semgrep_data):
 
     vulnerabilities = []
 
-    # Simulate AI triage based on Bandit findings
+    # Simulate AI classification if Bandit found issues
     if bandit_data.get("results"):
         vulnerabilities.append({
             "type": "Hardcoded Credential",
             "cwe": "CWE-798",
             "severity": "High",
             "confidence": "High",
-            "explanation": "Hardcoded credentials detected in source code. This may allow unauthorized access.",
-            "secure_fix": "Store credentials in environment variables and use secure password hashing."
+            "explanation": "Hardcoded credentials detected in source code.",
+            "secure_fix": "Use environment variables and secure password hashing."
         })
 
-    # Simulate logic flaw detection if certain risky patterns appear
+    # Simulate logic flaw detection
     if "os.system" in diff:
         vulnerabilities.append({
             "type": "Command Injection Risk",
             "cwe": "CWE-78",
             "severity": "Critical",
             "confidence": "High",
-            "explanation": "Use of os.system may allow command injection if user input is not sanitized.",
-            "secure_fix": "Use subprocess with argument lists and validate inputs properly."
+            "explanation": "Use of os.system may allow command injection.",
+            "secure_fix": "Use subprocess with argument lists and validate inputs."
         })
 
     return {"vulnerabilities": vulnerabilities}
@@ -63,7 +63,7 @@ if __name__ == "__main__":
 
     print(json.dumps(result, indent=2))
 
-    # 🔥 Severity-based blocking
+    # 🔥 Block pipeline on High or Critical
     for v in result.get("vulnerabilities", []):
         if v.get("severity", "").lower() in ["high", "critical"]:
             print("🚨 Blocking pipeline due to High/Critical vulnerability.")
