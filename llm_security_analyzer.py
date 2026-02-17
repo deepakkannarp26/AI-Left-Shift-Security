@@ -3,15 +3,13 @@ import json
 import subprocess
 from openai import OpenAI
 
-# 🔥 Read the exact secret name
-api_key = os.getenv("OPEN_AI_API_KEY")
+# Read API key from environment
+api_key = os.getenv("OPENAI_API_KEY")
 
 if not api_key:
-    raise ValueError("API Key not found in environment!")
+    raise ValueError("API key not found in environment!")
 
 client = OpenAI(api_key=api_key)
-
-MAX_DIFF_LENGTH = 6000
 
 
 def get_git_diff():
@@ -20,19 +18,12 @@ def get_git_diff():
         capture_output=True,
         text=True
     )
-
-    diff = result.stdout
-
-    if len(diff) > MAX_DIFF_LENGTH:
-        diff = diff[:MAX_DIFF_LENGTH] + "\n\n[TRUNCATED]"
-
-    return diff
+    return result.stdout
 
 
 def load_json_file(file_path):
     if not os.path.exists(file_path):
         return {}
-
     with open(file_path, "r") as f:
         return json.load(f)
 
@@ -40,9 +31,10 @@ def load_json_file(file_path):
 def analyze_security(diff, bandit_data, semgrep_data):
 
     system_prompt = """
-You are a Senior Application Security Engineer performing AI-driven vulnerability triage.
+You are a Senior Application Security Engineer.
 
-Return ONLY valid JSON:
+Analyze the code diff and SAST findings.
+Return ONLY valid JSON in this format:
 
 {
   "vulnerabilities": [
@@ -50,10 +42,7 @@ Return ONLY valid JSON:
       "type": "",
       "cwe": "",
       "severity": "",
-      "is_false_positive": false,
-      "confidence": "",
-      "explanation": "",
-      "secure_fix": ""
+      "explanation": ""
     }
   ]
 }
@@ -80,15 +69,7 @@ Semgrep Findings:
     )
 
     content = response.choices[0].message.content
-
-    try:
-        parsed = json.loads(content)
-        return parsed
-    except json.JSONDecodeError:
-        return {
-            "error": "Invalid JSON returned",
-            "raw_output": content
-        }
+    return json.loads(content)
 
 
 if __name__ == "__main__":
@@ -106,11 +87,8 @@ if __name__ == "__main__":
 
     print(json.dumps(result, indent=2))
 
-    vulnerabilities = result.get("vulnerabilities", [])
-
-    for v in vulnerabilities:
-        severity = v.get("severity", "").lower()
-
-        if severity in ["critical", "high"]:
-            print("\n🚨 Blocking pipeline due to High/Critical vulnerability.")
+    # 🔥 Severity blocking
+    for v in result.get("vulnerabilities", []):
+        if v.get("severity", "").lower() in ["high", "critical"]:
+            print("🚨 Blocking pipeline due to High/Critical vulnerability.")
             exit(1)
