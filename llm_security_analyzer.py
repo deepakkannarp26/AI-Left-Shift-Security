@@ -19,20 +19,23 @@ def get_git_diff():
     # Trim large diffs
     if len(diff) > MAX_DIFF_LENGTH:
         diff = diff[:MAX_DIFF_LENGTH] + "\n\n[TRUNCATED]"
+
     return diff
 
 
 def load_json_file(file_path):
     if not os.path.exists(file_path):
         return {}
+
     with open(file_path, "r") as f:
         return json.load(f)
 
 
 def analyze_security(diff, bandit_data, semgrep_data):
 
- system_prompt = """
+    system_prompt = """
 You are a Senior Application Security Engineer performing AI-driven vulnerability triage.
+
 Your responsibilities:
 1. Determine whether each finding is a TRUE vulnerability or a FALSE POSITIVE.
 2. Map the issue to correct CWE ID.
@@ -62,7 +65,8 @@ Return ONLY valid JSON in this format:
   ]
 }
 """
-   user_prompt = f"""
+
+    user_prompt = f"""
 Code Diff:
 {diff}
 
@@ -96,6 +100,7 @@ Semgrep Findings:
 
 
 if __name__ == "__main__":
+
     diff = get_git_diff()
 
     if not diff.strip():
@@ -106,4 +111,5 @@ if __name__ == "__main__":
     semgrep_data = load_json_file("semgrep-report.json")
 
     result = analyze_security(diff, bandit_data, semgrep_data)
+
     print(result)
