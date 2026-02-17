@@ -113,3 +113,18 @@ if __name__ == "__main__":
     result = analyze_security(diff, bandit_data, semgrep_data)
 
     print(result)
+
+# Enforce severity blocking
+try:
+    parsed = json.loads(result)
+    vulnerabilities = parsed.get("vulnerabilities", [])
+
+    for v in vulnerabilities:
+        severity = v.get("severity", "").lower()
+
+        if severity in ["critical", "high"]:
+            print("\n🚨 Blocking pipeline due to High/Critical vulnerability.")
+            exit(1)
+
+except Exception as e:
+    print("Error while enforcing severity policy:", str(e))
