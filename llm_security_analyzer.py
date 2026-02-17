@@ -3,7 +3,7 @@ import json
 import subprocess
 from openai import OpenAI
 
-client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+client = OpenAI(api_key=os.getenv("OPEN_AI_API_KEY"))
 
 MAX_DIFF_LENGTH = 6000  # prevent token overflow
 
