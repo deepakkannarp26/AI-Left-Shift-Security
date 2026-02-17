@@ -10,6 +10,5 @@ def login():
         return "Logged in"
     return "Invalid"
 
-import os
-api_key = "SECRET_KEY_123"
+
 
