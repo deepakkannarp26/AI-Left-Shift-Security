@@ -3,8 +3,13 @@ import json
 import subprocess
 from openai import OpenAI
 
-# OpenAI client (automatically reads OPENAI_API_KEY from environment)
-client = OpenAI()
+# 🔥 Read the exact secret name
+api_key = os.getenv("OPEN_AI_API_KEY")
+
+if not api_key:
+    raise ValueError("API Key not found in environment!")
+
+client = OpenAI(api_key=api_key)
 
 MAX_DIFF_LENGTH = 6000
 
@@ -36,14 +41,6 @@ def analyze_security(diff, bandit_data, semgrep_data):
 
     system_prompt = """
 You are a Senior Application Security Engineer performing AI-driven vulnerability triage.
-
-Responsibilities:
-1. Determine if each finding is TRUE vulnerability or FALSE POSITIVE.
-2. Map correct CWE.
-3. Assign severity: Low, Medium, High, Critical.
-4. Provide short technical explanation.
-5. Suggest secure fix.
-6. Provide confidence: Low/Medium/High.
 
 Return ONLY valid JSON:
 
@@ -109,7 +106,6 @@ if __name__ == "__main__":
 
     print(json.dumps(result, indent=2))
 
-    # 🔥 Severity-based blocking
     vulnerabilities = result.get("vulnerabilities", [])
 
     for v in vulnerabilities:
