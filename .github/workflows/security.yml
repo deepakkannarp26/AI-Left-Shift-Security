@@ -31,7 +31,7 @@ jobs:
 
     - name: Run LLM Security Analyzer
       env:
-        OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+        OPEN_AI_API_KEY: ${{ secrets.OPEN_AI_API_KEY }}
       run: |
         pip install openai
         python llm_security_analyzer.py
