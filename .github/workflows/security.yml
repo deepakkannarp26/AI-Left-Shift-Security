@@ -20,12 +20,12 @@ jobs:
     - name: Run Bandit Scan
       run: |
         pip install bandit
-        bandit -r src/ -f json -o bandit-report.json //true
+        bandit -r src/ -f json -o bandit-report.json || true
 
     - name: Run Semgrep Scan
       run: |
         pip install semgrep
-        semgrep --config=auto src/ --json > semgrep-report.json //true
+        semgrep --config=auto src/ --json > semgrep-report.json || true
 
     - name: Run LLM Security Analyzer
       env:
