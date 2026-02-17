@@ -1,38 +1,120 @@
-name: Left Shift Security Scan
+import os
+import json
+import subprocess
+from openai import OpenAI
 
-on:
-  push:
-    branches: ["main"]
+# OpenAI client (automatically reads OPENAI_API_KEY from environment)
+client = OpenAI()
 
-jobs:
-  security:
-    runs-on: ubuntu-latest
+MAX_DIFF_LENGTH = 6000
 
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-      with:
-        fetch-depth: 0
 
-    - name: Setup Python
-      uses: actions/setup-python@v5
-      with:
-        python-version: "3.10"
+def get_git_diff():
+    result = subprocess.run(
+        ["git", "diff", "HEAD~1"],
+        capture_output=True,
+        text=True
+    )
 
-    - name: Install Dependencies
-      run: |
-        pip install bandit semgrep openai
+    diff = result.stdout
 
-    - name: Run Bandit Scan
-      run: |
-        bandit -r src/ -f json -o bandit-report.json || true
+    if len(diff) > MAX_DIFF_LENGTH:
+        diff = diff[:MAX_DIFF_LENGTH] + "\n\n[TRUNCATED]"
 
-    - name: Run Semgrep Scan
-      run: |
-        semgrep --config=auto src/ --json > semgrep-report.json || true
+    return diff
 
-    - name: Run LLM Security Analyzer
-      env:
-        OPENAI_API_KEY: ${{ secrets.OPEN_AI_API_KEY }}
-      run: |
-        python llm_security_analyzer.py
+
+def load_json_file(file_path):
+    if not os.path.exists(file_path):
+        return {}
+
+    with open(file_path, "r") as f:
+        return json.load(f)
+
+
+def analyze_security(diff, bandit_data, semgrep_data):
+
+    system_prompt = """
+You are a Senior Application Security Engineer performing AI-driven vulnerability triage.
+
+Responsibilities:
+1. Determine if each finding is TRUE vulnerability or FALSE POSITIVE.
+2. Map correct CWE.
+3. Assign severity: Low, Medium, High, Critical.
+4. Provide short technical explanation.
+5. Suggest secure fix.
+6. Provide confidence: Low/Medium/High.
+
+Return ONLY valid JSON:
+
+{
+  "vulnerabilities": [
+    {
+      "type": "",
+      "cwe": "",
+      "severity": "",
+      "is_false_positive": false,
+      "confidence": "",
+      "explanation": "",
+      "secure_fix": ""
+    }
+  ]
+}
+"""
+
+    user_prompt = f"""
+Code Diff:
+{diff}
+
+Bandit Findings:
+{json.dumps(bandit_data, indent=2)}
+
+Semgrep Findings:
+{json.dumps(semgrep_data, indent=2)}
+"""
+
+    response = client.chat.completions.create(
+        model="gpt-4o-mini",
+        temperature=0.2,
+        messages=[
+            {"role": "system", "content": system_prompt},
+            {"role": "user", "content": user_prompt}
+        ]
+    )
+
+    content = response.choices[0].message.content
+
+    try:
+        parsed = json.loads(content)
+        return parsed
+    except json.JSONDecodeError:
+        return {
+            "error": "Invalid JSON returned",
+            "raw_output": content
+        }
+
+
+if __name__ == "__main__":
+
+    diff = get_git_diff()
+
+    if not diff.strip():
+        print("No changes detected.")
+        exit(0)
+
+    bandit_data = load_json_file("bandit-report.json")
+    semgrep_data = load_json_file("semgrep-report.json")
+
+    result = analyze_security(diff, bandit_data, semgrep_data)
+
+    print(json.dumps(result, indent=2))
+
+    # 🔥 Severity-based blocking
+    vulnerabilities = result.get("vulnerabilities", [])
+
+    for v in vulnerabilities:
+        severity = v.get("severity", "").lower()
+
+        if severity in ["critical", "high"]:
+            print("\n🚨 Blocking pipeline due to High/Critical vulnerability.")
+            exit(1)
