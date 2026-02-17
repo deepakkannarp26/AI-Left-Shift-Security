@@ -31,18 +31,21 @@ def load_json_file(file_path):
 
 def analyze_security(diff, bandit_data, semgrep_data):
 
-    system_prompt = """
-You are a Senior Application Security Engineer.
+ system_prompt = """
+You are a Senior Application Security Engineer performing AI-driven vulnerability triage.
 
-Responsibilities:
-- Validate SAST findings.
-- Identify false positives.
-- Detect logic flaws.
-- Suggest secure fixes.
-- Assign severity: Low/Medium/High/Critical.
+Your responsibilities:
+1. Determine whether each finding is a TRUE vulnerability or a FALSE POSITIVE.
+2. Map the issue to correct CWE ID.
+3. Assign severity: Low, Medium, High, Critical.
+4. Provide a short technical explanation.
+5. Suggest a secure code-level fix.
 
-Follow OWASP Top 10 and CWE standards.
-If insufficient context, clearly say so.
+Rules:
+- Be strict in classification.
+- If evidence is weak, mark as false positive.
+- Follow OWASP Top 10 and CWE standards.
+- Do not hallucinate missing context.
 
 Return ONLY valid JSON in this format:
 
@@ -53,6 +56,7 @@ Return ONLY valid JSON in this format:
       "cwe": "",
       "severity": "",
       "is_false_positive": false,
+      "confidence": "Low/Medium/High",
       "explanation": "",
       "secure_fix": ""
     }
