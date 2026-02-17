@@ -1,15 +1,6 @@
 import os
 import json
 import subprocess
-from openai import OpenAI
-
-# Read API key from environment
-api_key = os.getenv("OPENAI_API_KEY")
-
-if not api_key:
-    raise ValueError("API key not found in environment!")
-
-client = OpenAI(api_key=api_key)
 
 
 def get_git_diff():
@@ -28,48 +19,33 @@ def load_json_file(file_path):
         return json.load(f)
 
 
-def analyze_security(diff, bandit_data, semgrep_data):
+def mock_ai_analysis(diff, bandit_data, semgrep_data):
 
-    system_prompt = """
-You are a Senior Application Security Engineer.
+    vulnerabilities = []
 
-Analyze the code diff and SAST findings.
-Return ONLY valid JSON in this format:
+    # Simulate AI triage based on Bandit findings
+    if bandit_data.get("results"):
+        vulnerabilities.append({
+            "type": "Hardcoded Credential",
+            "cwe": "CWE-798",
+            "severity": "High",
+            "confidence": "High",
+            "explanation": "Hardcoded credentials detected in source code. This may allow unauthorized access.",
+            "secure_fix": "Store credentials in environment variables and use secure password hashing."
+        })
 
-{
-  "vulnerabilities": [
-    {
-      "type": "",
-      "cwe": "",
-      "severity": "",
-      "explanation": ""
-    }
-  ]
-}
-"""
+    # Simulate logic flaw detection if certain risky patterns appear
+    if "os.system" in diff:
+        vulnerabilities.append({
+            "type": "Command Injection Risk",
+            "cwe": "CWE-78",
+            "severity": "Critical",
+            "confidence": "High",
+            "explanation": "Use of os.system may allow command injection if user input is not sanitized.",
+            "secure_fix": "Use subprocess with argument lists and validate inputs properly."
+        })
 
-    user_prompt = f"""
-Code Diff:
-{diff}
-
-Bandit Findings:
-{json.dumps(bandit_data, indent=2)}
-
-Semgrep Findings:
-{json.dumps(semgrep_data, indent=2)}
-"""
-
-    response = client.chat.completions.create(
-        model="gpt-4o-mini",
-        temperature=0.2,
-        messages=[
-            {"role": "system", "content": system_prompt},
-            {"role": "user", "content": user_prompt}
-        ]
-    )
-
-    content = response.choices[0].message.content
-    return json.loads(content)
+    return {"vulnerabilities": vulnerabilities}
 
 
 if __name__ == "__main__":
@@ -83,11 +59,11 @@ if __name__ == "__main__":
     bandit_data = load_json_file("bandit-report.json")
     semgrep_data = load_json_file("semgrep-report.json")
 
-    result = analyze_security(diff, bandit_data, semgrep_data)
+    result = mock_ai_analysis(diff, bandit_data, semgrep_data)
 
     print(json.dumps(result, indent=2))
 
-    # 🔥 Severity blocking
+    # 🔥 Severity-based blocking
     for v in result.get("vulnerabilities", []):
         if v.get("severity", "").lower() in ["high", "critical"]:
             print("🚨 Blocking pipeline due to High/Critical vulnerability.")
