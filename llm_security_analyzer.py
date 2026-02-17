@@ -10,7 +10,7 @@ MAX_DIFF_LENGTH = 6000  # prevent token overflow
 
 def get_git_diff():
     result = subprocess.run(
-        ["git", "diff", "origin/main...HEAD"],
+        ["git", "diff", "HEAD~1"],
         capture_output=True,
         text=True
     )
