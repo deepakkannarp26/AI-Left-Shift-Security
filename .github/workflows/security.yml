@@ -1,7 +1,7 @@
 name: Left Shift Security Scan
 
 on:
-  pull_request: 
+  push:  
     branches: ["main"]
 
 jobs:
