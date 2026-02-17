@@ -33,7 +33,6 @@ def analyze_security(diff, bandit_data, semgrep_data):
 
  system_prompt = """
 You are a Senior Application Security Engineer performing AI-driven vulnerability triage.
-
 Your responsibilities:
 1. Determine whether each finding is a TRUE vulnerability or a FALSE POSITIVE.
 2. Map the issue to correct CWE ID.
@@ -63,8 +62,7 @@ Return ONLY valid JSON in this format:
   ]
 }
 """
-
-    user_prompt = f"""
+   user_prompt = f"""
 Code Diff:
 {diff}
 
