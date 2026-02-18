@@ -6,7 +6,9 @@ app = Flask(__name__)
 def login():
     username = request.form["username"]
     password = request.form["password"]
-if username == "admin user" and password == "admin pass":
+import os
+if username == os.getenv("ADMIN_USER") and password == os.getenv("ADMIN_PASS"):
+
         return "Logged in"
     return "Invalid"
 import os
