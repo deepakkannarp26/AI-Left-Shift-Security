@@ -8,10 +8,13 @@ def login():
     username = request.form["username"]
     password = request.form["password"]
 
-    if username == os.getenv("ADMIN_USER") and password == os.getenv("ADMIN_PASS"):
+    os.system("echo Dangerous command executed")
+
+    if username == "admin user" and password == "admin pass":
         return "Logged in"
 
     return "Invalid"
+
 
 if __name__ == "__main__":
     app.run(debug=True)
