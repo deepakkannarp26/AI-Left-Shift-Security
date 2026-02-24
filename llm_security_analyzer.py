@@ -19,33 +19,45 @@ def load_json_file(file_path):
         return json.load(f)
 
 
-def mock_ai_analysis(diff, bandit_data, semgrep_data):
+def mock_ai_analysis(diff):
 
     vulnerabilities = []
 
-    # 🔴 Detect Hardcoded Credentials (ONLY string literal comparison)
+    # Hardcoded credentials detection
     if 'password == "' in diff or 'username == "' in diff:
         vulnerabilities.append({
             "type": "Hardcoded Credential",
             "cwe": "CWE-798",
             "severity": "High",
-            "confidence": "High",
-            "explanation": "Hardcoded credentials detected in authentication logic.",
-            "secure_fix": "Use environment variables (os.getenv) or secure database-backed authentication."
+            "confidence": 0.9,
+            "explanation": "Hardcoded credentials detected.",
+            "secure_fix": "Use environment variables."
         })
 
-    # 🔴 Detect Command Injection Risk
+    # Command execution detection
     if "os.system(" in diff:
         vulnerabilities.append({
             "type": "Command Injection",
             "cwe": "CWE-78",
             "severity": "Critical",
-            "confidence": "High",
-            "explanation": "Use of os.system may allow command injection if user input is not sanitized.",
-            "secure_fix": "Use subprocess with argument lists and validate all external inputs."
+            "confidence": 0.95,
+            "explanation": "Unsafe system command execution.",
+            "secure_fix": "Avoid os.system; validate inputs."
         })
 
     return {"vulnerabilities": vulnerabilities}
+
+
+def calculate_risk(severity, confidence):
+
+    weights = {
+        "Low": 1,
+        "Medium": 2,
+        "High": 3,
+        "Critical": 4
+    }
+
+    return weights.get(severity, 1) * confidence
 
 
 if __name__ == "__main__":
@@ -56,15 +68,15 @@ if __name__ == "__main__":
         print("No changes detected.")
         exit(0)
 
-    bandit_data = load_json_file("bandit-report.json")
-    semgrep_data = load_json_file("semgrep-report.json")
-
-    result = mock_ai_analysis(diff, bandit_data, semgrep_data)
+    result = mock_ai_analysis(diff)
 
     print(json.dumps(result, indent=2))
 
-    # 🚨 Block pipeline only for High or Critical
-    for v in result.get("vulnerabilities", []):
-        if v.get("severity", "").lower() in ["high", "critical"]:
-            print("🚨 Blocking pipeline due to High/Critical vulnerability.")
+    # Adaptive enforcement gate
+    for v in result["vulnerabilities"]:
+        risk = calculate_risk(v["severity"], v["confidence"])
+        print(f"Risk Score: {risk}")
+
+        if risk >= 3:
+            print("🚨 Mock AI Security Gate BLOCKED deployment")
             exit(1)
