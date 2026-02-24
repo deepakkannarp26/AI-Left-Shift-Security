@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Left Shift Security Dashboard</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Outfit:wght@500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="blob blob-1"></div>
+    <div class="blob blob-2"></div>
+    <div class="blob blob-3"></div>
+
+    <div class="container">
+        <header>
+            <div class="logo-area">
+                <div class="logo-icon">🛡️</div>
+                <div>
+                    <h1>AI Defense Hub</h1>
+                    <p class="subtitle">Mock AI Architecture</p>
+                </div>
+            </div>
+            <div class="header-status">
+                <span class="status-indicator"></span>
+                System Protecting
+            </div>
+        </header>
+
+        <section class="kpi-grid">
+            <div class="kpi-card stat-safe">
+                <div class="kpi-icon">✅</div>
+                <div class="kpi-content">
+                    <h3>Scanned Files</h3>
+                    <div class="kpi-value">1,402</div>
+                </div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-icon">🤖</div>
+                <div class="kpi-content">
+                    <h3>AI Confidence</h3>
+                    <div class="kpi-value">95%</div>
+                </div>
+            </div>
+            <div class="kpi-card stat-danger" id="kpi-vulns">
+                <div class="kpi-icon">⚠️</div>
+                <div class="kpi-content">
+                    <h3>Blocked Issues</h3>
+                    <div class="kpi-value" id="vuln-count">0</div>
+                </div>
+            </div>
+        </section>
+
+        <section class="main-panel">
+            <div class="panel-header">
+                <h2>Latest Intelligence Report</h2>
+                <div class="badge">Live AI Analysis</div>
+            </div>
+            
+            <div class="loader-container" id="loader">
+                <div class="spinner"></div>
+                <p>Analyzing Security Telemetry...</p>
+            </div>
+
+            <div class="vulnerability-list" id="vuln-list" style="display: none;">
+                <!-- Vulnerability cards injected here via JS -->
+            </div>
+            
+            <div id="no-issues" class="success-state" style="display: none;">
+                <div class="success-icon">🎉</div>
+                <h3>No Critical Issues Detected</h3>
+                <p>The AI analyzer found zero high-risk vulnerabilities in the latest commit.</p>
+            </div>
+        </section>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

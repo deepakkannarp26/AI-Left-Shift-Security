@@ -1,0 +1,20 @@
+{
+  "vulnerabilities": [
+    {
+      "type": "Command Injection",
+      "cwe": "CWE-78",
+      "severity": "Critical",
+      "confidence": 0.95,
+      "explanation": "Unsafe system command execution detected via os.system(). An attacker could potentially execute arbitrary code on the host machine.",
+      "secure_fix": "Avoid os.system; use subprocess.run with validated inputs and shell=False."
+    },
+    {
+      "type": "Hardcoded Credential",
+      "cwe": "CWE-798",
+      "severity": "High",
+      "confidence": 0.9,
+      "explanation": "Hardcoded credentials detected in the codebase (e.g., password == \"...\"). This explicitly exposes sensitive information.",
+      "secure_fix": "Use environment variables (os.getenv) or a secure secrets manager."
+    }
+  ]
+}
