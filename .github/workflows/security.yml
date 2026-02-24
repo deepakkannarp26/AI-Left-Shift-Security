@@ -3,6 +3,8 @@ name: Left Shift Security Scan
 on:
   push:
     branches: ["main"]
+  pull_request:
+    branches: ["main"]
 
 jobs:
   security:
@@ -32,5 +34,17 @@ jobs:
           semgrep --config=auto src/ --json > semgrep-report.json || true
 
       - name: Run Mock LLM Security Analyzer
+        continue-on-error: true # So we can still upload artifacts even if it fails
         run: |
           python llm_security_analyzer.py
+
+      - name: Upload Security Reports for Dashboard
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: security-reports
+          path: |
+            bandit-report.json
+            semgrep-report.json
+            mock-ai-report.json
+          retention-days: 14
