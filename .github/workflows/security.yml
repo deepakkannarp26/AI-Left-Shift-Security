@@ -9,6 +9,9 @@ on:
 jobs:
   security:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write # Required for PR comments
 
     steps:
       - name: Checkout code
@@ -23,7 +26,13 @@ jobs:
 
       - name: Install Dependencies
         run: |
-          pip install bandit semgrep
+          pip install bandit semgrep google-generativeai
+
+      - name: Run GitLeaks (Secrets Scan)
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        continue-on-error: true
 
       - name: Run Bandit Scan
         run: |
@@ -33,10 +42,21 @@ jobs:
         run: |
           semgrep --config=auto src/ --json > semgrep-report.json || true
 
-      - name: Run Mock LLM Security Analyzer
+      - name: Run Gemini LLM Security Analyzer
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
         continue-on-error: true # So we can still upload artifacts even if it fails
         run: |
           python llm_security_analyzer.py
+
+      - name: Post AI Remediation Comment
+        if: github.event_name == 'pull_request'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          if [ -f pr_comment.md ]; then
+            gh pr comment ${{ github.event.pull_request.number }} --body-file pr_comment.md
+          fi
 
       - name: Upload Security Reports for Dashboard
         uses: actions/upload-artifact@v4
@@ -46,5 +66,5 @@ jobs:
           path: |
             bandit-report.json
             semgrep-report.json
-            mock-ai-report.json
+            ai-report.json
           retention-days: 14

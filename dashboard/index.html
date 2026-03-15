@@ -1,21 +1,21 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AI Left Shift Security Dashboard</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Outfit:wght@500;600;700;800&display=swap" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Outfit:wght@500;600;700;800&display=swap"
+        rel="stylesheet">
     <link rel="stylesheet" href="styles.css">
 </head>
-<body>
-    <div class="blob blob-1"></div>
-    <div class="blob blob-2"></div>
-    <div class="blob blob-3"></div>
 
+<body>
     <div class="container">
-        <header>
+        <header class="clean-panel">
             <div class="logo-area">
                 <div class="logo-icon">🛡️</div>
                 <div>
@@ -34,7 +34,7 @@
                 <div class="kpi-icon">✅</div>
                 <div class="kpi-content">
                     <h3>Scanned Files</h3>
-                    <div class="kpi-value">1,402</div>
+                    <div class="kpi-value">0</div>
                 </div>
             </div>
             <div class="kpi-card">
@@ -53,21 +53,41 @@
             </div>
         </section>
 
-        <section class="main-panel">
+        <section class="severity-breakdown clean-panel" id="severity-breakdown" style="display: none;">
+            <div class="breakdown-header">
+                <h3>Vulnerability Severity Breakdown</h3>
+                <span class="total-issues">Total: <span id="breakdown-total">0</span></span>
+            </div>
+            <div class="progress-bar-container">
+                <div class="progress-bar critical" id="bar-critical" style="width: 0%"></div>
+                <div class="progress-bar high" id="bar-high" style="width: 0%"></div>
+                <div class="progress-bar medium" id="bar-medium" style="width: 0%"></div>
+                <div class="progress-bar low" id="bar-low" style="width: 0%"></div>
+            </div>
+            <div class="breakdown-legend">
+                <div class="legend-item"><span class="dot critical"></span>Critical: <span id="count-critical">0</span>
+                </div>
+                <div class="legend-item"><span class="dot high"></span>High: <span id="count-high">0</span></div>
+                <div class="legend-item"><span class="dot medium"></span>Medium: <span id="count-medium">0</span></div>
+                <div class="legend-item"><span class="dot low"></span>Low: <span id="count-low">0</span></div>
+            </div>
+        </section>
+
+        <section class="main-panel clean-panel">
             <div class="panel-header">
                 <h2>Latest Intelligence Report</h2>
                 <div class="badge">Live AI Analysis</div>
             </div>
-            
+
             <div class="loader-container" id="loader">
-                <div class="spinner"></div>
-                <p>Analyzing Security Telemetry...</p>
+                <div class="cupertino-spinner"></div>
+                <p>Loading Telemetry...</p>
             </div>
 
             <div class="vulnerability-list" id="vuln-list" style="display: none;">
                 <!-- Vulnerability cards injected here via JS -->
             </div>
-            
+
             <div id="no-issues" class="success-state" style="display: none;">
                 <div class="success-icon">🎉</div>
                 <h3>No Critical Issues Detected</h3>
@@ -78,4 +98,5 @@
 
     <script src="script.js"></script>
 </body>
+
 </html>

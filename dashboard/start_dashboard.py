@@ -14,7 +14,7 @@ class Handler(http.server.SimpleHTTPRequestHandler):
 
 def start_server():
     with socketserver.TCPServer(("", PORT), Handler) as httpd:
-        print(f"🔒 AI Defense Dashboard running at http://localhost:{PORT}")
+        print(f"AI Defense Dashboard running at http://localhost:{PORT}")
         print("Press Ctrl+C to stop.")
         httpd.serve_forever()
 

@@ -1,0 +1,44 @@
+{
+  "vulnerabilities": [
+    {
+      "type": "Start Process With A Shell",
+      "cwe": "CWE-78",
+      "severity": "Critical",
+      "confidence": 0.95,
+      "explanation": "Starting a process with a shell: Seems safe, but may be changed in the future, consider rewriting without shell",
+      "secure_fix": "Avoid os.system or shell=True. Use subprocess modules with validated inputs and avoid shell execution.",
+      "file": "src/app.py",
+      "line": 12
+    },
+    {
+      "type": "Start Process With Partial Path",
+      "cwe": "CWE-78",
+      "severity": "Critical",
+      "confidence": 0.95,
+      "explanation": "Starting a process with a partial executable path",
+      "secure_fix": "Avoid os.system or shell=True. Use subprocess modules with validated inputs and avoid shell execution.",
+      "file": "src/app.py",
+      "line": 12
+    },
+    {
+      "type": "Hardcoded Password String",
+      "cwe": "CWE-259",
+      "severity": "Low",
+      "confidence": 0.7,
+      "explanation": "Possible hardcoded password: 'admin pass'",
+      "secure_fix": "Use environment variables or a secure vault to store and retrieve credentials instead of hardcoding.",
+      "file": "src/app.py",
+      "line": 14
+    },
+    {
+      "type": "Flask Debug True",
+      "cwe": "CWE-94",
+      "severity": "Critical",
+      "confidence": 0.7,
+      "explanation": "A Flask app appears to be run with debug=True, which exposes the Werkzeug debugger and allows the execution of arbitrary code.",
+      "secure_fix": "Ensure debug mode is disabled (debug=False) in production environments to prevent arbitrary code execution.",
+      "file": "src/app.py",
+      "line": 21
+    }
+  ]
+}
